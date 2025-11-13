@@ -27,6 +27,9 @@ public class SantaGroup {
 	@Column 
 	private Integer sorted;
 	
+	@Column(columnDefinition="nvarchar(max)")
+	private String base64;	
+	
 	public SantaGroup() {
 		this.sorted = 0;
 	}

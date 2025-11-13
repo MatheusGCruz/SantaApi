@@ -25,8 +25,12 @@ public class PlayerService {
 		try {
 			String userId = oauthService.searchUid(token);
 			Player newPlayer = new Player(userId, nickName, groupId);
+            List<Player> players = playerRepository.findAllByUserIdAndGroupId(userId, groupId);
+            if(!players.isEmpty()){
+                return  players.get(0).getNickName();
+            }
 			Player savedPlayer = playerRepository.save(newPlayer);
-			return groupService.getGroup(savedPlayer.getGroupId()).getGroupName();
+			return savedPlayer.getNickName();
 		}
 		catch(Exception ex) {
 			return "Error "+ex.getMessage();
@@ -72,10 +76,10 @@ public class PlayerService {
 			List<Player> groupList = playerRepository.findAllByGroupId(groupId);
 			
 			Player actualPlayer = playList.get(0);
-			String playerPosition = cryptService.decryptFromHex(actualPlayer.getSantaOrder()); 
+			String playerPosition = cryptService.decryptFromHex(actualPlayer.getSantaOrder());
+            if(playerPosition == null){return returnString;}
 			Integer position = Integer.parseInt(playerPosition.split(actualPlayer.getNickName())[0]);
 			Integer sorted = position+1==groupList.size()?0:position+1;
-			
 
 			
 			for(Player player : groupList){
@@ -92,5 +96,16 @@ public class PlayerService {
 			return "Error: "+ex.getMessage();
 		}
 	}
+
+    public String newSanta(String token, String groupName, String nickName) {
+        try {
+
+            SantaGroup santaGroup = groupService.newGroup(token, groupName);
+            return newPlayer(token, nickName, santaGroup.getGroupId());
+        }catch(Exception ex) {
+            return "error: " + ex;
+        }
+
+    }
 
 }

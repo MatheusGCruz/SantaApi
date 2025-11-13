@@ -12,11 +12,7 @@ import org.springframework.stereotype.Service;
 public class OauthService {
 	
 	public String searchUid(String token) {
-		return token;
-	}
 
-	public String searchUidBkp(String token) {
-		
         String apiUrl = System.getenv("OAUTH_API_URL");
         String apiSystem = System.getenv("OAUTH_API_SYSTEM");
 

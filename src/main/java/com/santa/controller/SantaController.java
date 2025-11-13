@@ -2,6 +2,8 @@ package com.santa.controller;
 
 import java.util.List;
 
+import com.santa.entity.ResultGroup;
+import com.santa.service.ResultGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,25 +25,40 @@ public class SantaController {
 	@Autowired	private CryptService 	cryptService;
 	@Autowired	private PlayerService 	playerService;
 	@Autowired	private GroupService	groupService;
+    @Autowired  private ResultGroupService resultGroupService;
+
+    @GetMapping()
+    public List<ResultGroup> getGroups(@RequestHeader("Authorization") String token) {
+        return resultGroupService.getResultGroups(token);
+    }
 	
-	@GetMapping()
+	@GetMapping("/healthcheck")
 	public String healthCheck() {
 		return "OK";
 	}
-	
-	
+
+    @GetMapping("/newSanta")
+    public String newGroup(@RequestHeader("Authorization") String token, @RequestHeader("GroupName") String groupName, @RequestHeader("NickName") String nickName) {
+        return playerService.newSanta(token, groupName, nickName);
+    }
+
 	@GetMapping("/newPlayer")
 	public String newPlayer(@RequestHeader("Authorization") String token, @RequestHeader("NickName") String nickName, @RequestHeader("GroupId") String groupId) {
 		return playerService.newPlayer(token, nickName, groupId);		
 	}
 	
 	@GetMapping("/newGroup")
-	public String newGroup(@RequestHeader("Authorization") String token, @RequestHeader("GroupName") String groupName) {
+	public SantaGroup newGroup(@RequestHeader("Authorization") String token, @RequestHeader("GroupName") String groupName) {
 		return groupService.newGroup(token, groupName);		
 	}
-	
+
+    @GetMapping("/group")
+    public SantaGroup getGroup(@RequestHeader("GroupId") String groupId) {
+        return groupService.getGroup(groupId);
+    }
+
 	@GetMapping("/groups")
-	public List<SantaGroup> getGroups(@RequestHeader("Authorization") String token) {
+	public List<SantaGroup> getGroupsBkp(@RequestHeader("Authorization") String token) {
 		return groupService.getGroups(token);		
 	}
 	

@@ -14,7 +14,8 @@ public class GroupService {
 
 	@Autowired 	private UtilService 		utilService;
 	@Autowired	private GroupRepository 	groupRepository;
-	@Autowired 	private	OauthService		oauthService; 
+	@Autowired 	private	OauthService		oauthService;
+    @Autowired  private QrCodeService	    qrCodeService;
 	
 	public List<SantaGroup> getGroups(String token){
 		try {
@@ -25,18 +26,24 @@ public class GroupService {
 		}		
 	}
 	
-	public String newGroup(String token, String groupName) {
+	public SantaGroup newGroup(String token, String groupName) {
 		SantaGroup santaGroup = new SantaGroup();
 		santaGroup.setUserId(groupName);
 		santaGroup.setGroupName(groupName);
 		santaGroup.setGroupId(generateGroupId());
-		
+
 		try {
-			String userId = oauthService.searchUid(token);
-			santaGroup.setUserId(oauthService.searchUid(userId)); 
-			return groupRepository.save(santaGroup).getGroupId();			
+            santaGroup.setBase64(qrCodeService.generateBase64(santaGroup.getGroupId()));
+            String userId = oauthService.searchUid(token);
+            List<SantaGroup> groups = groupRepository.findAllByGroupNameAndUserId(groupName, userId);
+			santaGroup.setUserId(userId);
+            if(!groups.isEmpty()){
+                return  groups.get(0);
+            }
+			return groupRepository.save(santaGroup);
 		}catch(Exception ex) {
-			return "error: " + ex;
+            System.out.println("error: " + ex);
+            return new SantaGroup();
 		}		
 	}
 	
@@ -66,4 +73,6 @@ public class GroupService {
 	public SantaGroup saveGroup(SantaGroup group) {
 		return groupRepository.save(group);
 	}
+
+
 }

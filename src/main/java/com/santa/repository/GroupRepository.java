@@ -12,4 +12,6 @@ public interface GroupRepository extends JpaRepository<SantaGroup,Long>{
 	List<SantaGroup> findAllByGroupId(String newUid);
 
 	List<SantaGroup> findAllByUserId(String token);
+
+    List<SantaGroup> findAllByGroupNameAndUserId(String groupName, String userId);
 }
